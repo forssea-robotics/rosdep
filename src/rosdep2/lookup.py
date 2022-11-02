@@ -428,8 +428,10 @@ class RosdepLookup(object):
                             depend_graph[depend_rosdep_key]['dependencies'] = list(more_dependencies)
 
                     except ResolutionError as e:
+                        print("ResolutionError: ", e)
                         errors[resource_name] = e
             except ResourceNotFound as e:
+                print("ResourceNotFound: ", e)
                 errors[resource_name] = e
 
         try:
