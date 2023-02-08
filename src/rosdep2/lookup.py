@@ -415,17 +415,23 @@ class RosdepLookup(object):
                         depend_graph[rosdep_key]['installer_key'] = installer_key
                         depend_graph[rosdep_key]['install_keys'] = list(resolution)
                         depend_graph[rosdep_key]['dependencies'] = list(dependencies)
+                        dependencies = prune_skipped_packages(dependencies, self.skipped_keys, self.verbose)
                         while dependencies:
                             depend_rosdep_key = dependencies.pop()
                             # prevent infinite loop
                             if depend_rosdep_key in depend_graph:
                                 continue
-                            installer_key, resolution, more_dependencies = \
-                                self.resolve(depend_rosdep_key, resource_name, installer_context)
-                            dependencies.extend(more_dependencies)
-                            depend_graph[depend_rosdep_key]['installer_key'] = installer_key
-                            depend_graph[depend_rosdep_key]['install_keys'] = list(resolution)
-                            depend_graph[depend_rosdep_key]['dependencies'] = list(more_dependencies)
+                            try:
+                                installer_key, resolution, more_dependencies = \
+                                    self.resolve(depend_rosdep_key, resource_name, installer_context)
+                                more_dependencies = prune_skipped_packages(more_dependencies, self.skipped_keys, self.verbose)
+                                dependencies.extend(more_dependencies)
+                                depend_graph[depend_rosdep_key]['installer_key'] = installer_key
+                                depend_graph[depend_rosdep_key]['install_keys'] = list(resolution)
+                                depend_graph[depend_rosdep_key]['dependencies'] = list(more_dependencies)
+                            except ResolutionError as e:
+                                print("(sub)ResolutionError: ", e)
+                                errors[resource_name] = e
 
                     except ResolutionError as e:
                         print("ResolutionError: ", e)
