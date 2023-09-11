@@ -32,6 +32,7 @@ from __future__ import print_function
 import os
 import sys
 import yaml
+import subprocess
 try:
     import cPickle as pickle
 except ImportError:
@@ -116,9 +117,11 @@ def get_sources_cache_dir():
 # Default rosdep.yaml format.  For now this is the only valid type and
 # is specified for future compatibility.
 TYPE_YAML = 'yaml'
+# Custom JFrog type
+TYPE_JFROG_YAML = 'jfrogyaml'
 # git-buildpackage repo list
 TYPE_GBPDISTRO = 'gbpdistro'
-VALID_TYPES = [TYPE_YAML, TYPE_GBPDISTRO]
+VALID_TYPES = [TYPE_YAML, TYPE_JFROG_YAML, TYPE_GBPDISTRO]
 
 
 class DataSource(object):
@@ -311,6 +314,33 @@ def download_rosdep_data(url):
         raise DownloadFailure(str(e))
 
 
+def download_rosdep_data_jfrog(url):
+    """
+    :raises: :exc:`DownloadFailure` If data cannot be
+        retrieved (e.g. 404, bad YAML format, server down).
+    """
+    try:
+        s = url.split('/')
+        repo = s[4]
+        f = s[-1]
+        cp = subprocess.run(f"jf rt dl {repo}/{f} /tmp/{f}", shell=True)
+        if cp.returncode != 0:
+            raise DownloadFailure('could not download jfrog file')
+
+        cp = subprocess.run(f"sed -i 's/source/jfrog/g' /tmp/{f}", shell=True)
+        if cp.returncode != 0:
+            raise DownloadFailure('could not apply jfrog key change')
+
+        with open(f"/tmp/{f}", 'r') as src:
+            data = yaml.safe_load(src.read())
+            if type(data) != dict:
+                raise DownloadFailure('rosdep data from [%s] is not a YAML dictionary' % (url))
+            return data
+    except yaml.YAMLError as e:
+        raise DownloadFailure(str(e))
+
+
+
 def download_default_sources_list(url=DEFAULT_SOURCES_LIST_URL):
     """
     Download (and validate) contents of default sources list.
@@ -465,6 +495,8 @@ def update_sources_list(sources_list_dir=None, sources_cache_dir=None,
         try:
             if source.type == TYPE_YAML:
                 rosdep_data = download_rosdep_data(source.url)
+            elif source.type == TYPE_JFROG_YAML:
+                rosdep_data = download_rosdep_data_jfrog(source.url)
             elif source.type == TYPE_GBPDISTRO:  # DEPRECATED, do not use this file. See REP137
                 if not source.tags[0] in ['electric', 'fuerte']:
                     if not quiet:
