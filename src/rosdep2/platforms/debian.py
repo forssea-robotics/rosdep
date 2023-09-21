@@ -151,6 +151,7 @@ def register_ubuntu(context):
     context.add_os_installer_key(OS_UBUNTU, GEM_INSTALLER)
     context.add_os_installer_key(OS_UBUNTU, NPM_INSTALLER)
     context.add_os_installer_key(OS_UBUNTU, SOURCE_INSTALLER)
+    context.add_os_installer_key(OS_UBUNTU, JFROG_INSTALLER)
     context.set_default_os_installer_key(OS_UBUNTU, lambda self: APT_INSTALLER)
     context.set_os_version_type(OS_UBUNTU, OsDetect.get_codename)
 
