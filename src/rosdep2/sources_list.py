@@ -327,7 +327,7 @@ def download_rosdep_data_jfrog(url):
         if cp.returncode != 0:
             raise DownloadFailure('could not download jfrog file')
 
-        cp = subprocess.run(f"sed -i 's/source: h/jfrog: h/g' /tmp/{f}", shell=True)
+        cp = subprocess.run(f"sed -ri 's/ source:/ jfrog:/g' /tmp/{f}", shell=True)
         if cp.returncode != 0:
             raise DownloadFailure('could not apply jfrog key change')
 
