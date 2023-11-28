@@ -64,6 +64,7 @@ class DependencyGraph(defaultdict):
     """
     def __init__(self):
         defaultdict.__init__(self, Resolution)
+        self.verified_keys = []
 
     def detect_cycles(self, rosdep_key, traveled_keys):
         """
@@ -78,7 +79,9 @@ class DependencyGraph(defaultdict):
         # traveled_keys.append(rosdep_key)
         new_traveled_keys = traveled_keys + [rosdep_key]
         for dependency in self[rosdep_key]['dependencies']:
-            self.detect_cycles(dependency, new_traveled_keys)
+            if dependency not in self.verified_keys:
+                self.verified_keys.append(dependency)
+                self.detect_cycles(dependency, new_traveled_keys)
 
     def validate(self):
         """
