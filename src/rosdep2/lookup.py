@@ -398,6 +398,7 @@ class RosdepLookup(object):
         :raises: :exc:`RosdepInternalError` if unexpected error in constructing dependency graph
         :raises: :exc:`InvalidData` if a cycle occurs in constructing dependency graph
         """
+        print('Resolving dependencies...')
         depend_graph = DependencyGraph()
         errors = {}
         # TODO: resolutions dictionary should be replaced with resolution model instead of mapping (undefined) keys.
@@ -410,6 +411,7 @@ class RosdepLookup(object):
                 rosdep_keys = prune_skipped_packages(rosdep_keys, self.skipped_keys, self.verbose)
                 for rosdep_key in rosdep_keys:
                     try:
+                        print(f'Finding dependencies for: {rosdep_key}')
                         installer_key, resolution, dependencies = \
                             self.resolve(rosdep_key, resource_name, installer_context)
                         depend_graph[rosdep_key]['installer_key'] = installer_key
@@ -424,6 +426,7 @@ class RosdepLookup(object):
                             try:
                                 installer_key, resolution, more_dependencies = \
                                     self.resolve(depend_rosdep_key, resource_name, installer_context)
+                                print(f'[{rosdep_key}] Finding sub-dependencies for: {depend_rosdep_key}')
                                 more_dependencies = prune_skipped_packages(more_dependencies, self.skipped_keys, self.verbose)
                                 dependencies.extend(more_dependencies)
                                 depend_graph[depend_rosdep_key]['installer_key'] = installer_key
