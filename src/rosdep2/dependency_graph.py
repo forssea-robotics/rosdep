@@ -65,6 +65,7 @@ class DependencyGraph(defaultdict):
     def __init__(self):
         defaultdict.__init__(self, Resolution)
         self.verified_keys = []
+        self.verified_uninstall_keys = []
 
     def detect_cycles(self, rosdep_key, traveled_keys):
         """
@@ -146,6 +147,9 @@ class DependencyGraph(defaultdict):
         print(f'----> [__get_ordered_uninstalled] [{key}], deps: {self[key]["dependencies"]} ')
         uninstalled = []
         for dependency in self[key]['dependencies']:
-            uninstalled.extend(self.__get_ordered_uninstalled(dependency))
+            if dependency not in self.verified_uninstall_keys:
+                self.verified_uninstall_keys.append(dependency)
+                print(f'Added {dependency} to verified_uninstall_keys')
+                uninstalled.extend(self.__get_ordered_uninstalled(dependency))
         uninstalled.append((self[key]['installer_key'], self[key]['install_keys']))
         return uninstalled
