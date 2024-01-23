@@ -80,6 +80,7 @@ class DependencyGraph(defaultdict):
         new_traveled_keys = traveled_keys + [rosdep_key]
         for dependency in self[rosdep_key]['dependencies']:
             if dependency not in self.verified_keys:
+                print(f'Resolving key: {dependency}')
                 self.verified_keys.append(dependency)
                 self.detect_cycles(dependency, new_traveled_keys)
 
@@ -102,6 +103,7 @@ class DependencyGraph(defaultdict):
         # Check each entry for cyclical dependencies
         for rosdep_key in self:
             self.detect_cycles(rosdep_key, [])
+        print('Done validating DependencyGraph.')
 
     def get_ordered_dependency_list(self):
         """
@@ -119,24 +121,29 @@ class DependencyGraph(defaultdict):
         # Generate the dependency list
         dep_list = []
         for rosdep_key in self:
+            print(f'Adding ordered uninstalled for: {rosdep_key}')
             if self[rosdep_key]['is_root']:
                 dep_list.extend(self.__get_ordered_uninstalled(rosdep_key))
         # Make the list unique and remove empty entries
         result = []
         for item in dep_list:
             if item not in result and item[1] != []:
+                print(f'Appending {item} to unique list')
                 result.append(item)
         # Squash the results by installer_key
         squashed_result = []
         previous_installer_key = None
+        print('Squashing list')
         for installer_key, resolved in result:
             if previous_installer_key != installer_key:
                 squashed_result.append((installer_key, []))
                 previous_installer_key = installer_key
             squashed_result[-1][1].extend(resolved)
+        print(f'Done getting squashed result: {squashed_result}')
         return squashed_result
 
     def __get_ordered_uninstalled(self, key):
+        print(f'----> [__get_ordered_uninstalled] [{key}], deps: {self[key]["dependencies"]} ')
         uninstalled = []
         for dependency in self[key]['dependencies']:
             uninstalled.extend(self.__get_ordered_uninstalled(dependency))
