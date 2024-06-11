@@ -42,7 +42,7 @@ def _sub_fetch_file(url, md5sum=None):
     try:
         s = url.split('/')
         repo = s[4]
-        f = "/".join(s[-4:])
+        f = "/".join(s[5:])
         cp = subprocess.run(
             ["jf", "rt", "dl", f"{repo}/{f}"],
             stdout=subprocess.DEVNULL,
