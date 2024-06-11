@@ -243,7 +243,7 @@ def jfrog_urlretrieve(url):
     try:
         s = url.split('/')
         repo = s[4]
-        f = "/".join(s[-4:])
+        f = "/".join(s[5:])
         cp = subprocess.run(
             ["jf", "rt", "dl", f"{repo}/{f}"],
             stdout=subprocess.DEVNULL,
@@ -264,7 +264,7 @@ def install_source(resolved):
 
     s = resolved.tarball.split('/')
     repo = s[4]
-    filename = "/".join(s[-4:])
+    filename = "/".join(s[5:])
     tempdir = os.path.dirname(filename)
     f = jfrog_urlretrieve(resolved.tarball)
     assert f[0] == filename
