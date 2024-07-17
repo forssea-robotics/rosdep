@@ -116,39 +116,33 @@ class RosdepDefinition(object):
         # REP 111: rosdep first interprets the key as a
         # PACKAGE_MANAGER. If this test fails, it will be interpreted
         # as an OS_VERSION_CODENAME.
+        #
+        # FORSSEA: First check specific OS_VERSION_CODENAME
+        #
+
+        # data must be a dictionary, string, or list
         if type(data) == dict:
+            # check for
+            #   hardy:
+            #     apt:
+            #       stuff
+            print(data, os_version)
+
+            # if the os_version is not defined and there is no wildcard
+            if os_version not in data and '*' not in data:
+                pass
+            # if the os_version has the value None
+            elif os_version in data and data[os_version] is None:
+                pass
+            # if os version is not defined (and there is a wildcard) fallback to the wildcard
+            elif '*' in data and type(data['*']) == dict:
+                data = data['*']
+
             for installer_key in installer_keys:
                 if installer_key in data:
                     data = data[installer_key]
                     return_key = installer_key
                     break
-            else:
-                # data must be a dictionary, string, or list
-                if type(data) == dict:
-                    # check for
-                    #   hardy:
-                    #     apt:
-                    #       stuff
-
-                    # we've already checked for PACKAGE_MANAGER_KEY, so
-                    # version key must be present here for data to be valid
-                    # dictionary value.
-                    # if the os_version is not defined and there is no wildcard
-                    if os_version not in data and '*' not in data:
-                        raise ResolutionError(rosdep_key, self.data, queried_os, queried_ver, 'No definition of [%s] for OS version [%s]' % (rosdep_key, os_version))
-                    # if the os_version has the value None
-                    if os_version in data and data[os_version] is None:
-                        raise ResolutionError(rosdep_key, self.data, queried_os, queried_ver, '[%s] defined as "not available" for OS version [%s]' % (rosdep_key, os_version))
-                    # if os version is not defined (and there is a wildcard) fallback to the wildcard
-                    if os_version not in data:
-                        os_version = '*'
-                    data = data[os_version]
-                    if type(data) == dict:
-                        for installer_key in installer_keys:
-                            if installer_key in data:
-                                data = data[installer_key]
-                                return_key = installer_key
-                                break
 
         # Check if the rule is null
         if data is None:
