@@ -124,7 +124,6 @@ class RosdepDefinition(object):
             #   hardy:
             #     apt:
             #       stuff
-            print(data, os_version)
 
             # if the os_version is not defined and there is no wildcard
             if os_version not in data and '*' not in data:
@@ -133,6 +132,9 @@ class RosdepDefinition(object):
             elif os_version in data and data[os_version] is None:
                 pass
             # if os version is not defined (and there is a wildcard) fallback to the wildcard
+            elif os_version in data:
+                data = data[os_version]
+                pass
             elif '*' in data and type(data['*']) == dict:
                 data = data['*']
 
