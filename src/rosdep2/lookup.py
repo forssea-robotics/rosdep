@@ -139,6 +139,8 @@ class RosdepDefinition(object):
                 pass
             elif '*' in data and type(data['*']) == dict:
                 data = data['*']
+            elif '*' in data and type(data['*']) == list:
+                data = data['*']
 
             for installer_key in installer_keys:
                 if installer_key in data:
