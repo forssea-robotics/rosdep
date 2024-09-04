@@ -81,6 +81,17 @@ class RosdepDefinition(object):
                 if verbose:
                     print('[%s] adding rules for os [%s] to [%s]' % (origin, os_name, self.rosdep_key), file=sys.stderr)
                 self.data[os_name] = rules
+            elif type(rules) == dict and type(self.data[os_name]) == dict:
+                for os_version, rules in rules.items():
+                    if os_version not in self.data[os_name]:
+                        if verbose:
+                            print('[%s] adding rules for os [%s] version [%s] to [%s]' % (origin, os_name, os_version, self.rosdep_key), file=sys.stderr)
+                        self.data[os_name][os_version] = rules
+            elif type(rules) == list and type(self.data[os_name]) == dict:
+                if '*' not in self.data[os_name]:
+                    if verbose:
+                        print('[%s] adding rules for os [%s] version \'*\' to [%s]' % (origin, os_name, self.rosdep_key), file=sys.stderr)
+                    self.data[os_name]['*'] = rules
             elif verbose:
                 print('[%s] ignoring [%s] for os [%s], already loaded' % (origin, self.rosdep_key, os_name), file=sys.stderr)
 
