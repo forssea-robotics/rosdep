@@ -140,9 +140,11 @@ class RosdepDefinition(object):
 
             # if the os_version is not defined and there is no wildcard
             if os_version not in data and '*' not in data:
+                data = None
                 pass
             # if the os_version has the value None
             elif os_version in data and data[os_version] is None:
+                data = None
                 pass
             # if os version is not defined (and there is a wildcard) fallback to the wildcard
             elif os_version in data:
@@ -153,11 +155,12 @@ class RosdepDefinition(object):
             elif '*' in data and type(data['*']) == list:
                 data = data['*']
 
-            for installer_key in installer_keys:
-                if installer_key in data:
-                    data = data[installer_key]
-                    return_key = installer_key
-                    break
+            if data is not None:
+                for installer_key in installer_keys:
+                    if installer_key in data:
+                        data = data[installer_key]
+                        return_key = installer_key
+                        break
 
         # Check if the rule is null
         if data is None:
