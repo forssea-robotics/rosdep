@@ -312,6 +312,7 @@ class AptInstaller(PackageManagerInstaller):
         base_cmd = ['apt-get', 'install']
         if not interactive:
             base_cmd.append('-y')
+            base_cmd.append('--no-install-recommends')
         if quiet:
             base_cmd.append('-qq')
 
