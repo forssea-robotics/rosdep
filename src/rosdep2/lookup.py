@@ -424,10 +424,11 @@ class RosdepLookup(object):
                         print(f'Finding dependencies for: {rosdep_key}')
                         installer_key, resolution, dependencies = \
                             self.resolve(rosdep_key, resource_name, installer_context)
+                        dependencies = prune_catkin_packages(dependencies, self.verbose)
+                        dependencies = prune_skipped_packages(dependencies, self.skipped_keys, self.verbose)
                         depend_graph[rosdep_key]['installer_key'] = installer_key
                         depend_graph[rosdep_key]['install_keys'] = list(resolution)
                         depend_graph[rosdep_key]['dependencies'] = list(dependencies)
-                        dependencies = prune_skipped_packages(dependencies, self.skipped_keys, self.verbose)
                         while dependencies:
                             depend_rosdep_key = dependencies.pop()
                             # prevent infinite loop
@@ -437,6 +438,7 @@ class RosdepLookup(object):
                                 installer_key, resolution, more_dependencies = \
                                     self.resolve(depend_rosdep_key, resource_name, installer_context)
                                 print(f'[{rosdep_key}] Finding sub-dependencies for: {depend_rosdep_key}')
+                                more_dependencies = prune_catkin_packages(more_dependencies, self.verbose)
                                 more_dependencies = prune_skipped_packages(more_dependencies, self.skipped_keys, self.verbose)
                                 dependencies.extend(more_dependencies)
                                 depend_graph[depend_rosdep_key]['installer_key'] = installer_key
