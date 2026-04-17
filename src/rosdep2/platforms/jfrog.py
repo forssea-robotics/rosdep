@@ -43,20 +43,23 @@ def _sub_fetch_file(url, md5sum=None):
         s = url.split('/')
         repo = s[4]
         f = "/".join(s[5:])
-        print(f"Downloading: f = {f}, repo: {repo}, url: {url}")
         cp = subprocess.run(
             ["jf", "rt", "dl", f"{repo}/{f}"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT)
         if cp.returncode != 0:
             raise DownloadFailed(f"jfrog download returned {cp.returncode}")
-
-        with open(f, 'r') as pkg:
-            contents = pkg.read().encode('utf-8')
-            if md5sum is not None:
-                filehash = hashlib.md5(contents).hexdigest()
-                if md5sum and filehash != md5sum:
-                    raise DownloadFailed("md5sum didn't match for %s.  Expected %s got %s" % (url, md5sum, filehash))
+        try:
+            with open(f, 'r') as pkg:
+                contents = pkg.read().encode('utf-8')
+                if md5sum is not None:
+                    filehash = hashlib.md5(contents).hexdigest()
+                    if md5sum and filehash != md5sum:
+                        raise DownloadFailed("md5sum didn't match for %s.  Expected %s got %s" % (url, md5sum, filehash))
+        except FileNotFoundError as ex:
+            msg = f"Failed to downloading: f = {f}, repo: {repo}, url: {url}. Error: {ex}"
+            print(msg)
+            raise FileNotFoundError(str(msg))
 
     except DownloadFailed as ex:
         raise DownloadFailed(str(ex))
