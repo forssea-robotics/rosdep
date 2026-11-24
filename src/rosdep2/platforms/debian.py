@@ -47,6 +47,7 @@ from .gem import GEM_INSTALLER
 from .npm import NPM_INSTALLER
 from .source import SOURCE_INSTALLER
 from .jfrog import JFROG_INSTALLER
+from .harness import HARNESS_INSTALLER
 from ..installers import PackageManagerInstaller
 from ..shell_utils import read_stdout
 
@@ -78,6 +79,7 @@ def register_debian(context):
     context.add_os_installer_key(OS_DEBIAN, NPM_INSTALLER)
     context.add_os_installer_key(OS_DEBIAN, SOURCE_INSTALLER)
     context.add_os_installer_key(OS_DEBIAN, JFROG_INSTALLER)
+    context.add_os_installer_key(OS_DEBIAN, HARNESS_INSTALLER)
     context.set_default_os_installer_key(OS_DEBIAN, lambda self: APT_INSTALLER)
     context.set_os_version_type(OS_DEBIAN, OsDetect.get_codename)
 
@@ -151,6 +153,7 @@ def register_ubuntu(context):
     context.add_os_installer_key(OS_UBUNTU, NPM_INSTALLER)
     context.add_os_installer_key(OS_UBUNTU, SOURCE_INSTALLER)
     context.add_os_installer_key(OS_UBUNTU, JFROG_INSTALLER)
+    context.add_os_installer_key(OS_UBUNTU, HARNESS_INSTALLER)
     context.set_default_os_installer_key(OS_UBUNTU, lambda self: APT_INSTALLER)
     context.set_os_version_type(OS_UBUNTU, OsDetect.get_codename)
 

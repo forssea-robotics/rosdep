@@ -38,7 +38,8 @@ kwargs = {
         'console_scripts': [
             'rosdep = rosdep2.main:rosdep_main',
             'rosdep-source = rosdep2.install:install_main',
-            'rosdep-jfrog = rosdep2.install_jfrog:install_main'
+            'rosdep-jfrog = rosdep2.install_jfrog:install_main',
+            'rosdep-harness = rosdep2.install_harness:install_main'
         ]
     },
     'classifiers': [

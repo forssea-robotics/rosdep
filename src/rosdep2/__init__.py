@@ -70,9 +70,10 @@ def create_default_installer_context(verbose=False):
     from .platforms import slackware
     from .platforms import source
     from .platforms import jfrog
+    from .platforms import harness
 
     platform_mods = [alpine, arch, cygwin, debian, gentoo, nix, openembedded, opensuse, osx, redhat, slackware, freebsd]
-    installer_mods = [source, pip, gem, npm, jfrog] + platform_mods
+    installer_mods = [source, pip, gem, npm, jfrog, harness] + platform_mods
 
     context = InstallerContext()
     context.set_verbose(verbose)
